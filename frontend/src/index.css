@@ -1,0 +1,26 @@
+@import "tailwindcss";
+
+@theme {
+  --color-navy-950: #0a0e1a;
+  --color-navy-900: #0f1526;
+  --color-navy-800: #161d33;
+  --color-navy-700: #1f2842;
+  --color-navy-600: #2b3555;
+  --font-sans: "Segoe UI", system-ui, Roboto, sans-serif;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+}
+
+:focus-visible {
+  outline: 2px solid #4f46e5;
+  outline-offset: 2px;
+}
