@@ -1,11 +1,12 @@
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Check, Loader2 } from "lucide-react";
 import { AudioCapture } from "../../components/report/AudioCapture";
 import { PhotoCapture } from "../../components/report/PhotoCapture";
 import { LocationCapture } from "../../components/report/LocationCapture";
 import { setReportDraft } from "../../lib/reportDraftStore";
 import type { CapturedAudio, CapturedPhoto, CapturedLocation } from "../../types/report";
+import { BrandLogo } from "../../components/BrandLogo";
 
 export function ReportForm() {
   const navigate = useNavigate();
@@ -24,70 +25,110 @@ export function ReportForm() {
   }
 
   return (
-    <div className="min-h-screen bg-sky-50 pb-16">
-      <header className="border-b border-sky-100 bg-white px-4 py-4">
-        <div className="mx-auto flex max-w-xl items-center gap-3">
+    <div className="min-h-screen bg-offwhite pb-20 selection:bg-teal-500 selection:text-white">
+      <header className="sticky top-0 z-20 border-b border-slate-200 bg-white/80 px-4 py-4 backdrop-blur-md">
+        <div className="mx-auto flex max-w-2xl items-center justify-between">
           <Link
             to="/"
-            className="rounded-full p-2 text-slate-500 hover:bg-slate-100 focus-visible:bg-slate-100"
+            className="icon-btn flex h-10 w-10 text-slate-500 hover:bg-slate-100 hover:text-navy-950 active:bg-slate-200 focus-visible:bg-slate-100"
             aria-label="Back to home"
           >
             <ArrowLeft size={20} />
           </Link>
-          <h1 className="text-lg font-semibold text-slate-900">Report an issue</h1>
+          <BrandLogo variant="light" className="scale-90 origin-left" />
+          <div className="w-10"></div> {/* spacer for centering */}
         </div>
       </header>
 
-      <main className="mx-auto mt-6 flex max-w-xl flex-col gap-5 px-4">
-        <p className="text-sm text-slate-600">
-          Record a short voice note describing the problem, attach a photo, and share your
-          location. No account or typing needed.
-        </p>
+      <main className="mx-auto mt-8 flex max-w-2xl flex-col gap-8 px-4">
 
-        <section className="rounded-2xl border border-slate-200 bg-white p-5" aria-labelledby="voice-heading">
-          <h2 id="voice-heading" className="text-sm font-semibold text-slate-900">
-            1. Voice note
-          </h2>
-          <p className="mt-1 text-xs text-slate-500">
-            Record in the browser, or upload a file (M4A, MP3, WAV, OGG, WebM — max 10 MB).
-          </p>
-          <div className="mt-4">
+        <div className="animate-fade-up">
+          <h1 className="text-3xl font-extrabold tracking-tight text-navy-950 mb-2">Report an issue</h1>
+          <p className="text-slate-600">Complete these three steps to submit your report to the city.</p>
+        </div>
+
+        <div className="flex flex-col gap-6">
+          <section
+            className={`relative rounded-xl border ${audio ? 'border-teal-500 ring-1 ring-teal-500' : 'border-slate-200'} bg-white p-6 shadow-sm transition-all duration-300 animate-fade-up`}
+            aria-labelledby="voice-heading"
+          >
+            <div className="mb-6 flex items-center justify-between">
+              <div>
+                <h2 id="voice-heading" className="text-lg font-bold text-navy-950 flex items-center gap-2">
+                  <StepBadge complete={Boolean(audio)}>1</StepBadge>
+                  Voice note
+                </h2>
+                <p className="mt-1 text-sm text-slate-500">
+                  Describe the problem you are seeing.
+                </p>
+              </div>
+            </div>
             <AudioCapture value={audio} onChange={setAudio} />
-          </div>
-        </section>
+          </section>
 
-        <section className="rounded-2xl border border-slate-200 bg-white p-5" aria-labelledby="photo-heading">
-          <h2 id="photo-heading" className="text-sm font-semibold text-slate-900">
-            2. Photo
-          </h2>
-          <p className="mt-1 text-xs text-slate-500">JPEG, PNG, or WebP — max 5 MB.</p>
-          <div className="mt-4">
+          <section
+            className={`relative rounded-xl border ${photo ? 'border-teal-500 ring-1 ring-teal-500' : 'border-slate-200'} bg-white p-6 shadow-sm transition-all duration-300 animate-fade-up ${!audio && !photo ? 'opacity-50 pointer-events-none grayscale' : ''}`}
+            style={{ animationDelay: "80ms" }}
+            aria-labelledby="photo-heading"
+          >
+            <span className={`absolute -top-6 left-9 h-6 w-0.5 transition-colors duration-300 ${audio ? 'bg-teal-500' : 'bg-slate-200'}`} aria-hidden="true" />
+            <div className="mb-6 flex items-center justify-between">
+              <div>
+                <h2 id="photo-heading" className="text-lg font-bold text-navy-950 flex items-center gap-2">
+                  <StepBadge complete={Boolean(photo)}>2</StepBadge>
+                  Photo
+                </h2>
+                <p className="mt-1 text-sm text-slate-500">
+                  Take a clear picture of the issue as evidence.
+                </p>
+              </div>
+            </div>
             <PhotoCapture value={photo} onChange={setPhoto} />
-          </div>
-        </section>
+          </section>
 
-        <section className="rounded-2xl border border-slate-200 bg-white p-5" aria-labelledby="location-heading">
-          <h2 id="location-heading" className="text-sm font-semibold text-slate-900">
-            3. Location
-          </h2>
-          <p className="mt-1 text-xs text-slate-500">
-            Requires this page to be served over localhost or HTTPS. If access is denied, you
-            can use an approximate area location instead.
-          </p>
-          <div className="mt-4">
+          <section
+            className={`relative rounded-xl border ${location ? 'border-teal-500 ring-1 ring-teal-500' : 'border-slate-200'} bg-white p-6 shadow-sm transition-all duration-300 animate-fade-up ${!photo && !location ? 'opacity-50 pointer-events-none grayscale' : ''}`}
+            style={{ animationDelay: "160ms" }}
+            aria-labelledby="location-heading"
+          >
+            <span className={`absolute -top-6 left-9 h-6 w-0.5 transition-colors duration-300 ${photo ? 'bg-teal-500' : 'bg-slate-200'}`} aria-hidden="true" />
+            <div className="mb-6 flex items-center justify-between">
+              <div>
+                <h2 id="location-heading" className="text-lg font-bold text-navy-950 flex items-center gap-2">
+                  <StepBadge complete={Boolean(location)}>3</StepBadge>
+                  Location
+                </h2>
+                <p className="mt-1 text-sm text-slate-500">
+                  Share your location so staff can find it.
+                </p>
+              </div>
+            </div>
             <LocationCapture value={location} onChange={setLocation} />
-          </div>
-        </section>
+          </section>
+        </div>
 
         <button
           type="button"
           onClick={handleSubmit}
           disabled={!canSubmit}
-          className="mt-2 w-full rounded-full bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-40 hover:bg-slate-800"
+          className="btn-primary mt-6 flex w-full items-center justify-center gap-2 rounded-full px-6 py-4 text-lg disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-400 disabled:shadow-none"
         >
+          {submitting && <Loader2 size={20} className="animate-spin" aria-hidden="true" />}
           {submitting ? "Submitting…" : "Submit report"}
         </button>
       </main>
     </div>
+  );
+}
+
+function StepBadge({ complete, children }: { complete: boolean; children: ReactNode }) {
+  return (
+    <span
+      className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs transition-colors duration-300 ${
+        complete ? "bg-teal-500 text-white" : "bg-slate-100 text-slate-600"
+      }`}
+    >
+      {complete ? <Check size={14} className="animate-scale-in" aria-hidden="true" /> : children}
+    </span>
   );
 }

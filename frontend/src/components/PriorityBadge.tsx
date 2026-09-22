@@ -3,10 +3,10 @@ interface PriorityBadgeProps {
 }
 
 function tierFor(score: number): { label: string; classes: string } {
-  if (score >= 90) return { label: "Critical priority", classes: "bg-red-500/15 text-red-300 border-red-500/40" };
-  if (score >= 65) return { label: "High priority", classes: "bg-orange-500/15 text-orange-300 border-orange-500/40" };
-  if (score >= 40) return { label: "Medium priority", classes: "bg-yellow-500/15 text-yellow-300 border-yellow-500/40" };
-  return { label: "Low priority", classes: "bg-slate-500/15 text-slate-300 border-slate-500/40" };
+  if (score >= 90) return { label: "Critical priority", classes: "bg-red-400/10 text-red-400 border-transparent" };
+  if (score >= 65) return { label: "High priority", classes: "bg-orange-400/10 text-orange-400 border-transparent" };
+  if (score >= 40) return { label: "Medium priority", classes: "bg-yellow-400/10 text-yellow-400 border-transparent" };
+  return { label: "Low priority", classes: "bg-slate-400/10 text-slate-400 border-transparent" };
 }
 
 export function PriorityBadge({ score }: PriorityBadgeProps) {

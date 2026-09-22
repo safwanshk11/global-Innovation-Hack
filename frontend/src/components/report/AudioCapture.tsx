@@ -25,8 +25,6 @@ export function AudioCapture({ value, onChange }: AudioCaptureProps) {
         durationSeconds: recorder.seconds,
       });
     }
-    // Only react to a freshly recorded blob, not every render.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [recorder.status, recorder.audioBlob]);
 
   function handleUploadClick() {
@@ -64,9 +62,9 @@ export function AudioCapture({ value, onChange }: AudioCaptureProps) {
 
   if (value) {
     return (
-      <div className="flex flex-col gap-3 rounded-xl bg-emerald-50 px-4 py-3">
+      <div className="flex flex-col gap-3 rounded-xl bg-teal-50 px-4 py-4">
         <div className="flex items-center justify-between gap-3">
-          <span className="text-sm text-emerald-700">
+          <span className="text-sm font-medium text-teal-800">
             {value.source === "recording"
               ? `Voice note captured (${formatTime(value.durationSeconds ?? 0)})`
               : `${value.fileName ?? "Audio file"} attached`}
@@ -74,70 +72,86 @@ export function AudioCapture({ value, onChange }: AudioCaptureProps) {
           <button
             type="button"
             onClick={handleReplace}
-            className="flex items-center gap-1 text-xs font-medium text-emerald-700 underline-offset-2 hover:underline"
+            className="flex items-center gap-1 rounded-md px-2 py-1 text-xs font-bold text-teal-700 transition-all duration-150 hover:bg-teal-100 active:scale-95"
           >
-            <RotateCcw size={13} aria-hidden="true" />
+            <RotateCcw size={14} aria-hidden="true" />
             Replace
           </button>
         </div>
-        <audio controls src={value.url} className="w-full" />
+        <audio controls src={value.url} className="w-full h-10 outline-none" />
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-4">
       {recorder.status === "idle" && (
-        <div className="flex flex-wrap items-center gap-3">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
           <button
             type="button"
             onClick={recorder.start}
-            className="flex items-center gap-2 rounded-full bg-sky-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-sky-700 focus-visible:bg-sky-700"
+            className="group relative flex flex-1 items-center justify-center gap-3 overflow-hidden rounded-xl bg-navy-950 px-6 py-5 text-base font-bold text-white shadow-md transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg focus-visible:-translate-y-0.5 active:translate-y-0 active:scale-[0.98]"
           >
-            <Mic size={18} aria-hidden="true" />
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-teal-500 text-navy-950 transition-transform group-hover:scale-110">
+              <Mic size={18} aria-hidden="true" />
+            </div>
             Start recording
           </button>
           <button
             type="button"
             onClick={handleUploadClick}
-            className="flex items-center gap-2 rounded-full border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
+            className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-6 py-5 text-sm font-semibold text-slate-700 transition-all duration-200 hover:-translate-y-0.5 hover:bg-slate-100 hover:text-navy-950 active:translate-y-0 active:scale-[0.98]"
           >
-            <Upload size={16} aria-hidden="true" />
-            Upload audio file instead
+            <Upload size={18} aria-hidden="true" />
+            Upload file
           </button>
         </div>
       )}
 
       {recorder.status === "requesting" && (
-        <p className="flex items-center gap-2 text-sm text-slate-500">
-          <Loader2 size={16} className="animate-spin" aria-hidden="true" />
-          Requesting microphone access…
-        </p>
+        <div className="flex items-center justify-center gap-3 rounded-xl bg-slate-50 py-5">
+          <Loader2 size={18} className="animate-spin text-teal-500" aria-hidden="true" />
+          <p className="text-sm font-medium text-slate-600">
+            Requesting microphone access…
+          </p>
+        </div>
       )}
 
       {recorder.status === "recording" && (
         <button
           type="button"
           onClick={recorder.stop}
-          className="flex items-center gap-2 rounded-full bg-red-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-red-700 focus-visible:bg-red-700"
+          className="group relative flex w-full flex-col items-center justify-center gap-3 overflow-hidden rounded-xl bg-navy-950 px-6 py-8 text-base font-bold text-white shadow-lg transition-transform duration-200 hover:scale-[1.01] active:scale-[0.98]"
         >
-          <Square size={16} aria-hidden="true" />
-          Stop · {formatTime(recorder.seconds)}
+          {/* Signal rings background */}
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="absolute h-32 w-32 animate-[ping_2s_cubic-bezier(0,0,0.2,1)_infinite] rounded-full border-2 border-teal-500 opacity-20" />
+            <div className="absolute h-48 w-48 animate-[ping_2s_cubic-bezier(0,0,0.2,1)_infinite] rounded-full border border-teal-500 opacity-10" style={{ animationDelay: '200ms' }} />
+          </div>
+
+          <div className="relative z-10 flex h-14 w-14 animate-pulse items-center justify-center rounded-full bg-red-500 shadow-[0_0_15px_rgba(239,68,68,0.5)]">
+            <Square size={24} aria-hidden="true" className="fill-white" />
+          </div>
+
+          <div className="relative z-10 flex flex-col items-center">
+            <span className="text-2xl font-mono tracking-wider text-teal-400">{formatTime(recorder.seconds)}</span>
+            <span className="text-xs font-medium text-slate-400 mt-1 uppercase tracking-wider">Tap to stop</span>
+          </div>
         </button>
       )}
 
       {(recorder.status === "denied" || recorder.status === "unsupported" || recorder.status === "error") && (
-        <div className="flex flex-col gap-2 rounded-xl bg-red-50 px-4 py-3">
-          <p className="flex items-center gap-2 text-sm text-red-700">
-            <AlertTriangle size={15} aria-hidden="true" />
+        <div className="flex flex-col gap-3 rounded-xl border border-red-200 bg-red-50 px-5 py-4">
+          <p className="flex items-center gap-2 text-sm font-semibold text-red-700">
+            <AlertTriangle size={16} aria-hidden="true" />
             {recorder.errorMessage}
           </p>
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-wrap gap-4">
             {recorder.status !== "unsupported" && (
               <button
                 type="button"
                 onClick={recorder.start}
-                className="text-xs font-medium text-red-700 underline-offset-2 hover:underline"
+                className="text-sm font-bold text-red-700 underline-offset-4 hover:underline"
               >
                 Try again
               </button>
@@ -145,7 +159,7 @@ export function AudioCapture({ value, onChange }: AudioCaptureProps) {
             <button
               type="button"
               onClick={handleUploadClick}
-              className="text-xs font-medium text-red-700 underline-offset-2 hover:underline"
+              className="text-sm font-bold text-slate-700 underline-offset-4 hover:underline"
             >
               Upload audio file instead
             </button>
@@ -154,8 +168,8 @@ export function AudioCapture({ value, onChange }: AudioCaptureProps) {
       )}
 
       {uploadError && (
-        <p className="flex items-center gap-2 text-xs text-red-600">
-          <AlertTriangle size={13} aria-hidden="true" />
+        <p className="flex items-center gap-2 rounded-lg bg-red-50 px-3 py-2 text-xs font-medium text-red-600">
+          <AlertTriangle size={14} aria-hidden="true" />
           {uploadError}
         </p>
       )}

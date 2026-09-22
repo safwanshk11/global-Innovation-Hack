@@ -1,12 +1,247 @@
 @import "tailwindcss";
 
 @theme {
-  --color-navy-950: #0a0e1a;
-  --color-navy-900: #0f1526;
-  --color-navy-800: #161d33;
-  --color-navy-700: #1f2842;
-  --color-navy-600: #2b3555;
-  --font-sans: "Segoe UI", system-ui, Roboto, sans-serif;
+  --color-navy-950: #071426;
+  --color-navy-900: #0D1D33;
+  --color-navy-800: #162640;
+  --color-navy-700: #1C304D;
+  --color-navy-600: #2A4668;
+  --color-teal-500: #19B99A;
+  --color-teal-400: #67D7C0;
+  --color-teal-600: #128F76;
+  --color-offwhite: #F7F9F5;
+  --color-amber-500: #F2A93B;
+  --font-sans: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+@layer utilities {
+  .glass-panel-dark {
+    background: rgba(13, 29, 51, 0.72);
+    border: 1px solid rgba(103, 215, 192, 0.14);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 18px 50px rgba(2, 10, 22, 0.28);
+  }
+
+  @supports (backdrop-filter: blur(16px)) {
+    .glass-panel-dark {
+      backdrop-filter: blur(16px) saturate(125%);
+      -webkit-backdrop-filter: blur(16px) saturate(125%);
+    }
+  }
+
+  .glass-nav {
+    background: rgba(7, 20, 38, 0.85);
+    border-bottom: 1px solid rgba(103, 215, 192, 0.10);
+  }
+
+  @supports (backdrop-filter: blur(20px)) {
+    .glass-nav {
+      backdrop-filter: blur(20px) saturate(130%);
+      -webkit-backdrop-filter: blur(20px) saturate(130%);
+    }
+  }
+
+  .glass-panel-light {
+    background: rgba(247, 249, 245, 0.85);
+    border: 1px solid rgba(13, 29, 51, 0.08);
+    box-shadow: 0 8px 30px rgba(7, 20, 38, 0.06);
+  }
+
+  @supports (backdrop-filter: blur(12px)) {
+    .glass-panel-light {
+      backdrop-filter: blur(12px) saturate(110%);
+      -webkit-backdrop-filter: blur(12px) saturate(110%);
+    }
+  }
+
+  .glass-control {
+    background: rgba(25, 185, 154, 0.08);
+    border: 1px solid rgba(25, 185, 154, 0.2);
+    transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .glass-control:hover {
+    background: rgba(25, 185, 154, 0.15);
+    border-color: rgba(25, 185, 154, 0.4);
+    transform: translateY(-2px);
+  }
+
+  .glass-control:active {
+    transform: translateY(0);
+    background: rgba(25, 185, 154, 0.2);
+  }
+
+  .btn-signal {
+    background: var(--color-teal-500);
+    color: var(--color-navy-950);
+    font-weight: 700;
+    box-shadow: 0 4px 14px rgba(25, 185, 154, 0.25);
+    transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-signal::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(180deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 100%);
+    pointer-events: none;
+  }
+
+  .btn-signal:hover {
+    background: var(--color-teal-400);
+    box-shadow: 0 6px 20px rgba(25, 185, 154, 0.4);
+    transform: translateY(-2px);
+  }
+
+  .btn-signal:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(25, 185, 154, 0.3);
+  }
+
+  .chip-teal {
+    background: rgba(25, 185, 154, 0.15);
+    color: var(--color-teal-400);
+    border: 1px solid rgba(25, 185, 154, 0.3);
+  }
+
+  .chip-amber {
+    background: rgba(242, 169, 59, 0.15);
+    color: var(--color-amber-500);
+    border: 1px solid rgba(242, 169, 59, 0.3);
+  }
+
+  .motion-control {
+    transition-duration: 200ms;
+  }
+  .motion-panel {
+    transition-duration: 300ms;
+  }
+  .motion-entrance {
+    transition-duration: 500ms;
+  }
+
+  /* Primary action button (navy) — in-flow app actions like submit/retry. */
+  .btn-primary {
+    background: var(--color-navy-950);
+    color: var(--color-offwhite);
+    font-weight: 700;
+    box-shadow: 0 4px 14px rgba(7, 20, 38, 0.2);
+    transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .btn-primary:hover:not(:disabled) {
+    background: var(--color-navy-800);
+    box-shadow: 0 10px 26px rgba(7, 20, 38, 0.32);
+    transform: translateY(-2px);
+  }
+
+  .btn-primary:active:not(:disabled) {
+    transform: translateY(0) scale(0.97);
+    box-shadow: 0 2px 10px rgba(7, 20, 38, 0.25);
+  }
+
+  /* Secondary action button — pairs with .btn-primary. */
+  .btn-outline {
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(13, 29, 51, 0.12);
+    color: var(--color-navy-900);
+    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(7, 20, 38, 0.06);
+    transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .btn-outline:hover:not(:disabled) {
+    background: var(--color-offwhite);
+    border-color: rgba(13, 29, 51, 0.22);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(7, 20, 38, 0.1);
+  }
+
+  .btn-outline:active:not(:disabled) {
+    transform: translateY(0) scale(0.97);
+  }
+
+  /* Circular icon-only control — back arrows, hamburger toggles. Pair with
+     context-specific color/background utility classes in the markup. */
+  .icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+    transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .icon-btn:hover {
+    transform: scale(1.08);
+  }
+
+  .icon-btn:active {
+    transform: scale(0.92);
+  }
+
+  /* Shared hover lift for interactive cards/rows (summary tiles, list rows). */
+  .card-hover {
+    transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .card-hover:hover {
+    transform: translateY(-3px);
+    border-color: rgba(25, 185, 154, 0.35);
+    box-shadow: 0 14px 32px rgba(2, 10, 22, 0.35);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    @keyframes fade-up {
+      from {
+        opacity: 0;
+        transform: translateY(16px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes scale-in {
+      from {
+        opacity: 0;
+        transform: scale(0.92);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    .animate-fade-up {
+      animation: fade-up 550ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+
+    .animate-scale-in {
+      animation: scale-in 400ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+  }
+
+  /* Reveal on scroll utilities */
+  .reveal-on-scroll.is-revealed.opacity-0 {
+    opacity: 1 !important;
+  }
+  .reveal-on-scroll.is-revealed.translate-y-8 {
+    transform: translateY(0) !important;
+  }
+  .reveal-on-scroll.is-revealed.translate-x-\[-20px\] {
+    transform: translateX(0) !important;
+  }
+  .reveal-on-scroll.is-revealed.translate-x-\[20px\] {
+    transform: translateX(0) !important;
+  }
+  .reveal-on-scroll.line-vertical.is-revealed.h-0 {
+    height: 100% !important;
+  }
+  .reveal-on-scroll.line-horizontal.is-revealed.w-0 {
+    width: calc(100% - 6rem) !important;
+  }
 }
 
 html,
@@ -21,6 +256,62 @@ body {
 }
 
 :focus-visible {
-  outline: 2px solid #4f46e5;
+  outline: 2px solid var(--color-teal-500);
   outline-offset: 2px;
+}
+
+/* Theme Leaflet's default light chrome to match the navy glass UI. */
+.leaflet-container {
+  background: var(--color-navy-900);
+  font-family: var(--font-sans);
+}
+
+.leaflet-popup-content-wrapper {
+  background: var(--color-navy-900);
+  color: var(--color-offwhite);
+  border: 1px solid rgba(103, 215, 192, 0.16);
+  border-radius: 12px;
+  box-shadow: 0 18px 40px rgba(2, 10, 22, 0.45);
+}
+
+.leaflet-popup-content {
+  margin: 12px 14px;
+}
+
+.leaflet-popup-tip-container {
+  overflow: hidden;
+}
+
+.leaflet-popup-tip {
+  background: var(--color-navy-900);
+  border: 1px solid rgba(103, 215, 192, 0.16);
+  box-shadow: none;
+}
+
+.leaflet-popup-close-button {
+  color: rgba(247, 249, 245, 0.6) !important;
+}
+
+.leaflet-popup-close-button:hover {
+  color: var(--color-offwhite) !important;
+}
+
+.leaflet-control-zoom a {
+  background: var(--color-navy-900) !important;
+  color: var(--color-offwhite) !important;
+  border-color: rgba(103, 215, 192, 0.16) !important;
+  transition: background 150ms ease;
+}
+
+.leaflet-control-zoom a:hover {
+  background: var(--color-navy-800) !important;
+}
+
+.leaflet-control-attribution {
+  background: rgba(7, 20, 38, 0.75) !important;
+  color: rgba(247, 249, 245, 0.6) !important;
+}
+
+.leaflet-control-attribution a {
+  color: var(--color-teal-400) !important;
 }

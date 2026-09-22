@@ -53,24 +53,29 @@ export function LocationCapture({ value, onChange }: LocationCaptureProps) {
   if (value) {
     return (
       <div
-        className={`flex items-center justify-between gap-3 rounded-xl px-4 py-3 ${
-          value.source === "approximate" ? "bg-amber-50" : "bg-emerald-50"
+        className={`flex items-center justify-between gap-3 rounded-xl px-4 py-4 ${
+          value.source === "approximate" ? "bg-amber-50" : "bg-teal-50"
         }`}
       >
-        <span className={`text-sm ${value.source === "approximate" ? "text-amber-700" : "text-emerald-700"}`}>
-          {value.source === "browser"
-            ? `Location captured: ${value.lat.toFixed(5)}°, ${value.lng.toFixed(5)}°`
-            : "Using approximate area location (Ward 7, Rivermill District)"}
-        </span>
+        <div className="flex items-center gap-3">
+          <MapPin size={18} className={value.source === "approximate" ? "text-amber-500" : "text-teal-500"} />
+          <span className={`text-sm font-medium ${value.source === "approximate" ? "text-amber-800" : "text-teal-800"}`}>
+            {value.source === "browser"
+              ? `Location: ${value.lat.toFixed(5)}°, ${value.lng.toFixed(5)}°`
+              : "Using approximate area location"}
+          </span>
+        </div>
         <button
           type="button"
           onClick={requestLocation}
-          className={`flex items-center gap-1 whitespace-nowrap text-xs font-medium underline-offset-2 hover:underline ${
-            value.source === "approximate" ? "text-amber-700" : "text-emerald-700"
+          className={`flex items-center gap-1 whitespace-nowrap rounded-md px-2 py-1 text-xs font-bold transition-all duration-150 active:scale-95 ${
+            value.source === "approximate"
+              ? "text-amber-700 hover:bg-amber-100"
+              : "text-teal-700 hover:bg-teal-100"
           }`}
         >
-          <RotateCcw size={13} aria-hidden="true" />
-          {value.source === "approximate" ? "Use my location" : "Update"}
+          <RotateCcw size={14} aria-hidden="true" />
+          {value.source === "approximate" ? "Retry" : "Update"}
         </button>
       </div>
     );
@@ -78,26 +83,28 @@ export function LocationCapture({ value, onChange }: LocationCaptureProps) {
 
   if (requesting) {
     return (
-      <p className="flex items-center gap-2 text-sm text-slate-500">
-        <Loader2 size={16} className="animate-spin" aria-hidden="true" />
-        Waiting for location permission…
-      </p>
+      <div className="flex items-center justify-center gap-3 rounded-xl bg-slate-50 py-5">
+        <Loader2 size={18} className="animate-spin text-teal-500" aria-hidden="true" />
+        <p className="text-sm font-medium text-slate-600">
+          Waiting for location permission…
+        </p>
+      </div>
     );
   }
 
   if (errorKind) {
     return (
-      <div className="flex flex-col gap-2 rounded-xl bg-red-50 px-4 py-3">
-        <p className="flex items-center gap-2 text-sm text-red-700">
-          <AlertTriangle size={15} aria-hidden="true" />
+      <div className="flex flex-col gap-3 rounded-xl border border-red-200 bg-red-50 px-5 py-4">
+        <p className="flex items-center gap-2 text-sm font-semibold text-red-700">
+          <AlertTriangle size={16} aria-hidden="true" />
           {errorMessageFor(errorKind)}
         </p>
-        <div className="flex flex-wrap gap-3">
+        <div className="flex flex-wrap gap-4">
           {errorKind !== "unsupported" && (
             <button
               type="button"
               onClick={requestLocation}
-              className="text-xs font-medium text-red-700 underline-offset-2 hover:underline"
+              className="text-sm font-bold text-red-700 underline-offset-4 hover:underline"
             >
               Try again
             </button>
@@ -105,9 +112,9 @@ export function LocationCapture({ value, onChange }: LocationCaptureProps) {
           <button
             type="button"
             onClick={useApproximateLocation}
-            className="text-xs font-medium text-red-700 underline-offset-2 hover:underline"
+            className="text-sm font-bold text-slate-700 underline-offset-4 hover:underline"
           >
-            Use approximate area location instead
+            Use approximate area instead
           </button>
         </div>
       </div>
@@ -118,9 +125,9 @@ export function LocationCapture({ value, onChange }: LocationCaptureProps) {
     <button
       type="button"
       onClick={requestLocation}
-      className="flex items-center gap-2 rounded-full bg-sky-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-sky-700 focus-visible:bg-sky-700"
+      className="group flex w-full items-center justify-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-6 py-5 text-base font-bold text-slate-700 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-slate-100 hover:text-navy-950 hover:shadow-md focus-visible:-translate-y-0.5 active:translate-y-0 active:scale-[0.98]"
     >
-      <MapPin size={18} aria-hidden="true" />
+      <MapPin size={20} aria-hidden="true" className="text-teal-500 transition-transform duration-200 group-hover:scale-110" />
       Share my location
     </button>
   );

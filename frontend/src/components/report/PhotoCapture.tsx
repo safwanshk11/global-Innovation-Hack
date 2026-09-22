@@ -42,23 +42,23 @@ export function PhotoCapture({ value, onChange }: PhotoCaptureProps) {
   return (
     <div className="flex flex-col gap-3">
       {value ? (
-        <div className="flex flex-col gap-3 rounded-xl bg-emerald-50 p-3">
+        <div className="flex flex-col gap-3 rounded-xl bg-teal-50 p-4">
           <div className="flex items-center justify-between gap-3">
-            <span className="text-sm text-emerald-700">{value.file.name}</span>
-            <div className="flex gap-3">
+            <span className="text-sm font-medium text-teal-800">{value.file.name}</span>
+            <div className="flex gap-2">
               <button
                 type="button"
                 onClick={handlePickClick}
-                className="text-xs font-medium text-emerald-700 underline-offset-2 hover:underline"
+                className="rounded-md px-2 py-1 text-xs font-bold text-teal-700 transition-all duration-150 hover:bg-teal-100 active:scale-95"
               >
                 Replace
               </button>
               <button
                 type="button"
                 onClick={handleRemove}
-                className="flex items-center gap-1 text-xs font-medium text-emerald-700 underline-offset-2 hover:underline"
+                className="flex items-center gap-1 rounded-md px-2 py-1 text-xs font-bold text-red-600 transition-all duration-150 hover:bg-red-100 active:scale-95"
               >
-                <X size={13} aria-hidden="true" />
+                <X size={14} aria-hidden="true" />
                 Remove
               </button>
             </div>
@@ -66,23 +66,23 @@ export function PhotoCapture({ value, onChange }: PhotoCaptureProps) {
           <img
             src={value.url}
             alt="Preview of the attached photo"
-            className="max-h-48 w-full rounded-lg object-cover"
+            className="max-h-48 w-full rounded-lg object-cover shadow-sm border border-teal-500/20"
           />
         </div>
       ) : (
         <button
           type="button"
           onClick={handlePickClick}
-          className="flex items-center gap-2 rounded-full bg-sky-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-sky-700 focus-visible:bg-sky-700"
+          className="group flex w-full items-center justify-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-6 py-5 text-base font-bold text-slate-700 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-slate-100 hover:text-navy-950 hover:shadow-md focus-visible:-translate-y-0.5 active:translate-y-0 active:scale-[0.98]"
         >
-          <Camera size={18} aria-hidden="true" />
-          Add photo
+          <Camera size={20} aria-hidden="true" className="text-slate-400 transition-transform duration-200 group-hover:scale-110" />
+          Add photo evidence
         </button>
       )}
 
       {error && (
-        <p className="flex items-center gap-2 text-xs text-red-600">
-          <AlertTriangle size={13} aria-hidden="true" />
+        <p className="flex items-center gap-2 rounded-lg bg-red-50 px-3 py-2 text-xs font-medium text-red-600">
+          <AlertTriangle size={14} aria-hidden="true" />
           {error}
         </p>
       )}
