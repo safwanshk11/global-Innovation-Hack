@@ -19,7 +19,9 @@ export function computePriorityScore(issue: Issue): number {
   const corroborationPoints = Math.min(issue.corroborationCount * 3, 60);
   const populationPoints = Math.min(issue.estimatedAffectedPopulation / 20, 30);
   const agePoints = Math.min(issue.daysOpen * 1.5, 20);
-  return Math.round(severityPoints + corroborationPoints + populationPoints + agePoints);
+  const rawScore = severityPoints + corroborationPoints + populationPoints + agePoints;
+  // Normalize to a 0-100 scale (max raw score is 190)
+  return Math.round((rawScore / 190) * 100);
 }
 
 // Fictional issues in one sample city area ("Ward 7, Rivermill District").

@@ -1,9 +1,9 @@
 import type { IssueStatus } from "../types/issue";
 
 const STATUS_META: Record<IssueStatus, { label: string; classes: string }> = {
-  open: { label: "Open", classes: "bg-red-500/15 text-red-300 border-red-500/30" },
-  in_progress: { label: "In progress", classes: "bg-indigo-500/15 text-indigo-300 border-indigo-500/30" },
-  resolved: { label: "Resolved", classes: "bg-emerald-500/15 text-emerald-300 border-emerald-500/30" },
+  open: { label: "Open", classes: "bg-slate-400/10 text-slate-300 border-transparent" },
+  in_progress: { label: "In progress", classes: "bg-indigo-400/10 text-indigo-300 border-transparent" },
+  resolved: { label: "Resolved", classes: "bg-emerald-400/10 text-emerald-400 border-transparent" },
 };
 
 export function StatusBadge({ status }: { status: IssueStatus }) {

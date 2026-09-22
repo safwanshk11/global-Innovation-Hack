@@ -3,8 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { Loader2, CheckCircle2, AlertTriangle } from "lucide-react";
 import { getReportDraft, clearReportDraft } from "../../lib/reportDraftStore";
 import { submitReport, ApiError } from "../../lib/api";
+import { BrandLogo } from "../../components/BrandLogo";
 
-const PROCESSING_STEPS = ["Transcribing voice note…", "Analyzing details…"];
+const PROCESSING_STEPS = ["Processing media…", "Saving report…"];
 
 type Stage = "uploading" | "error" | "processing-steps";
 
@@ -22,9 +23,6 @@ export function ReportProcessing() {
     if (!draft) {
       navigate("/report", { replace: true });
     }
-    // Only need to check once on mount; a null draft means a direct nav
-    // or refresh with nothing to submit.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function runSubmission() {
@@ -73,63 +71,93 @@ export function ReportProcessing() {
 
   if (!draft) return null;
 
+  const progressPercent =
+    stage === "uploading"
+      ? 15
+      : stage === "processing-steps"
+        ? 40 + Math.round((stepIndex / PROCESSING_STEPS.length) * 60)
+        : 100;
+
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center gap-6 bg-sky-50 px-4 text-center">
-      {stage === "uploading" && (
-        <>
-          <Loader2 className="animate-spin text-sky-600" size={40} aria-hidden="true" />
-          <p className="text-sm text-slate-700">Uploading your report…</p>
-        </>
-      )}
+    <div className="flex min-h-screen flex-col items-center justify-center bg-offwhite px-4 text-center selection:bg-teal-500 selection:text-white">
 
-      {stage === "error" && (
-        <div className="flex flex-col items-center gap-4">
-          <AlertTriangle className="text-red-500" size={40} aria-hidden="true" />
-          <p className="text-sm text-red-700">
-            {errorMessage ?? "Something went wrong submitting your report."} Nothing was lost —
-            you can try again.
-          </p>
-          <div className="flex gap-3">
-            <button
-              type="button"
-              onClick={runSubmission}
-              className="rounded-full bg-sky-600 px-5 py-2.5 text-sm font-medium text-white hover:bg-sky-700"
-            >
-              Try again
-            </button>
-            <button
-              type="button"
-              onClick={() => navigate("/report")}
-              className="rounded-full border border-slate-300 bg-white px-5 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
-            >
-              Edit report
-            </button>
+      <div className="absolute top-8 w-full flex justify-center">
+        <BrandLogo variant="light" className="scale-90 origin-left" />
+      </div>
+
+      <div className="animate-scale-in relative w-full max-w-md flex flex-col items-center gap-8 overflow-hidden bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
+        {stage !== "error" && (
+          <div className="absolute top-0 inset-x-0 h-1.5 bg-slate-100">
+            <div
+              className="h-full bg-gradient-to-r from-teal-400 via-teal-500 to-teal-400 transition-all duration-500 ease-out"
+              style={{ width: `${progressPercent}%` }}
+            />
           </div>
-        </div>
-      )}
+        )}
+        {stage === "uploading" && (
+          <div className="flex flex-col items-center gap-6">
+            <Loader2 className="animate-spin text-teal-500" size={48} aria-hidden="true" />
+            <p className="text-lg font-medium text-navy-950">Uploading your report…</p>
+          </div>
+        )}
 
-      {stage === "processing-steps" && (
-        <>
-          <Loader2 className="animate-spin text-sky-600" size={40} aria-hidden="true" />
-          <ul className="space-y-2 text-sm">
-            <li className="flex items-center gap-2 text-emerald-600">
-              <CheckCircle2 size={16} aria-hidden="true" />
-              Report uploaded
-            </li>
-            {PROCESSING_STEPS.map((step, i) => (
-              <li
-                key={step}
-                className={`flex items-center gap-2 ${
-                  i < stepIndex ? "text-emerald-600" : i === stepIndex ? "text-slate-800" : "text-slate-300"
-                }`}
+        {stage === "error" && (
+          <div className="flex flex-col items-center gap-6">
+            <div className="flex h-20 w-20 items-center justify-center rounded-full bg-red-50 border border-red-100 text-red-600 shadow-sm">
+              <AlertTriangle size={40} aria-hidden="true" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold text-navy-950 mb-2">Submission failed</h1>
+              <p className="text-base text-slate-600">
+                {errorMessage ?? "Something went wrong submitting your report."} Nothing was lost — you can try again.
+              </p>
+            </div>
+            <div className="flex w-full flex-col gap-3 sm:flex-row mt-2">
+              <button
+                type="button"
+                onClick={runSubmission}
+                className="btn-primary flex flex-1 items-center justify-center rounded-full px-6 py-3.5 text-base focus-visible:-translate-y-0.5"
               >
-                {i < stepIndex ? <CheckCircle2 size={16} aria-hidden="true" /> : <span className="w-4" />}
-                {step}
+                Try again
+              </button>
+              <button
+                type="button"
+                onClick={() => navigate("/report")}
+                className="btn-outline flex flex-1 items-center justify-center rounded-full px-6 py-3.5 text-base focus-visible:-translate-y-0.5"
+              >
+                Edit report
+              </button>
+            </div>
+          </div>
+        )}
+
+        {stage === "processing-steps" && (
+          <div className="flex flex-col items-center w-full gap-8">
+            <Loader2 className="animate-spin text-teal-500" size={48} aria-hidden="true" />
+            <ul className="space-y-4 text-base text-left w-full max-w-xs">
+              <li className="flex items-center gap-3 text-teal-600 font-bold bg-teal-50 p-3 rounded-xl border border-teal-100">
+                <CheckCircle2 size={20} aria-hidden="true" />
+                Report uploaded
               </li>
-            ))}
-          </ul>
-        </>
-      )}
+              {PROCESSING_STEPS.map((step, i) => (
+                <li
+                  key={step}
+                  className={`flex items-center gap-3 font-medium transition-all duration-300 p-3 rounded-xl ${
+                    i < stepIndex
+                      ? "text-teal-600 bg-teal-50 border border-teal-100"
+                      : i === stepIndex
+                        ? "text-navy-950 bg-slate-50 border border-slate-200 shadow-sm"
+                        : "text-slate-400 border border-transparent"
+                  }`}
+                >
+                  {i < stepIndex ? <CheckCircle2 size={20} className="animate-scale-in" aria-hidden="true" /> : <span className="w-5" />}
+                  {step}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

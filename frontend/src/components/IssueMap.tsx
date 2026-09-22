@@ -1,5 +1,6 @@
 import { MapContainer, TileLayer, CircleMarker, Popup } from "react-leaflet";
 import { useNavigate } from "react-router-dom";
+import { FilterX } from "lucide-react";
 import type { IssueWithPriority } from "../types/issue";
 import { MapErrorBoundary } from "./MapErrorBoundary";
 import { categoryLabel } from "./CategoryIcon";
@@ -20,8 +21,9 @@ export function IssueMap({ issues }: IssueMapProps) {
 
   if (issues.length === 0) {
     return (
-      <div className="flex h-full min-h-[280px] items-center justify-center rounded-xl border border-navy-600 bg-navy-800 text-sm text-slate-400">
-        No issues match the current filters.
+      <div className="flex h-full min-h-[280px] flex-col items-center justify-center gap-2 rounded-xl border border-navy-800 bg-navy-900 text-center shadow-inner">
+        <FilterX size={22} className="text-slate-500" aria-hidden="true" />
+        <p className="text-sm font-medium text-slate-500">No signals match the current filters.</p>
       </div>
     );
   }
@@ -34,8 +36,8 @@ export function IssueMap({ issues }: IssueMapProps) {
         center={center}
         zoom={14}
         scrollWheelZoom={false}
-        className="h-full min-h-[280px] w-full rounded-xl"
-        aria-label="Map of open civic issues, colored by priority"
+        className="h-full min-h-[280px] w-full rounded-xl border border-navy-800 shadow-md z-0"
+        aria-label="Map of active civic signals, colored by priority"
       >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -52,9 +54,9 @@ export function IssueMap({ issues }: IssueMapProps) {
             }}
           >
             <Popup>
-              <div className="text-sm">
-                <p className="font-semibold">{issue.title}</p>
-                <p className="text-xs text-slate-600">
+              <div className="text-sm text-white">
+                <p className="font-bold mb-1">{issue.title}</p>
+                <p className="text-xs font-medium text-teal-400 uppercase tracking-wider">
                   {categoryLabel(issue.category)} · Priority {issue.priorityScore}
                 </p>
               </div>
