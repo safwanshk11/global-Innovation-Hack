@@ -14,10 +14,9 @@ an issue is one physical problem. Submission IDs deduplicate retries, not people
   geographic/semantic matching and isolated evaluation.
 - **Member 3:** separate worker, safe retries/recovery, operator commands,
   deterministic explained priority, and real issue/receipt API reads.
-- **Member 4 is still pending:** the current staff UI still imports sample issues,
-  and citizen pages still need real-state polling. A running backend does not make
-  the existing dashboard a live-data view. Inspect `/docs` or `/api/issues` for the
-  real backend results meanwhile.
+- **Member 4:** live receipt states, bounded visible-tab polling, server-filtered
+  staff queue and summaries, synchronized map selection, and real issue detail
+  with an expandable priority explanation. No runtime fixture fallback.
 
 Authentication, authorization, reporter ownership, abuse controls, dispatch,
 closure and notifications remain later work. Run this phase with controlled test
@@ -27,7 +26,7 @@ summaries are still model-produced and are not a substitute for access control.
 ## Setup
 
 Use Node compatible with the existing lockfile and Python 3.13 (the tested local
-worker used Python 3.13.7, macOS arm64). No frontend dependencies were upgraded.
+worker used Python 3.13.7, macOS arm64). Existing frontend dependency versions were preserved; Playwright was added for browser regression tests.
 
 Frontend:
 
@@ -206,6 +205,25 @@ speaker accuracy benchmark. The required twelve consented English/Tamil/Hindi
 recordings and speaker review remain outstanding. No claim of all-language or
 public-deployment readiness is made.
 
-Frontend regressions are separately checked with `npm run lint` and `npm run build`
-when Member 4 wires the UI. The existing in-memory draft is still lost on a full
-reload before obtaining a receipt ID; durable offline drafts are outside this phase.
+Frontend checks (run from `frontend/`):
+
+```bash
+npm run lint
+npm run build
+npm run test:e2e
+```
+
+Browser tests use installed Google Chrome (`npx playwright install chrome` if needed)
+and an isolated Vite server on port 5180. API doubles live only in tests and never
+submit real reports. Optional screenshot/live-read checks require `SCREENSHOT_DIR`,
+`LIVE_ISSUE_ID` and `LIVE_REPORT_ID`; the live check performs GET requests only.
+See `frontend/MEMBER4_HANDOFF.md` for coverage and limitations.
+
+Receipts poll every 2 seconds while visible, stop at terminal states or about
+90 seconds, and keep the saved ID during outages. “Check saved report status”
+performs a GET only. The queue/detail refresh every 10 seconds while visible,
+retain stale data during errors, and do not overlap requests. The map keeps its
+pan/zoom across refreshes; “Fit issues” explicitly resets its extent.
+
+The existing in-memory draft is still lost on a full reload before obtaining a
+receipt ID; durable offline drafts are outside this phase.

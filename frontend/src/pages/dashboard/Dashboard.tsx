@@ -1,8 +1,9 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Home, FilterX } from "lucide-react";
-import { SAMPLE_ISSUES } from "../../data/sampleIssues";
+import { Home, Loader2 } from "lucide-react";
 import type { IssueCategory, IssueStatus } from "../../types/issue";
+import { getIssues } from "../../lib/api";
+import { useLiveQuery } from "../../hooks/useLiveQuery";
 import { SummaryCards } from "../../components/SummaryCards";
 import { FilterBar } from "../../components/FilterBar";
 import { IssueRow } from "../../components/IssueRow";
@@ -12,106 +13,31 @@ import { BrandLogo } from "../../components/BrandLogo";
 export function Dashboard() {
   const [category, setCategory] = useState<IssueCategory | "all">("all");
   const [status, setStatus] = useState<IssueStatus | "all">("all");
-
-  const filteredIssues = useMemo(() => {
-    return SAMPLE_ISSUES.filter((issue) => {
-      if (category !== "all" && issue.category !== category) return false;
-      if (status !== "all" && issue.status !== status) return false;
-      return true;
-    });
-  }, [category, status]);
-
-  const hasActiveFilters = category !== "all" || status !== "all";
-
-  function clearFilters() {
-    setCategory("all");
-    setStatus("all");
-  }
-
-  return (
-    <div className="min-h-screen bg-navy-950 text-slate-100 selection:bg-teal-500 selection:text-white">
-      <header className="glass-nav sticky top-0 z-20 px-4 py-4">
-        <div className="mx-auto flex max-w-6xl items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Link
-              to="/"
-              className="icon-btn flex h-10 w-10 text-slate-400 hover:bg-navy-800 hover:text-white active:bg-navy-700"
-              aria-label="Back to home"
-            >
-              <Home size={20} />
-            </Link>
-            <div className="h-6 w-px bg-navy-700"></div>
-            <BrandLogo variant="dark" className="scale-75 origin-left" />
-            <div className="h-6 w-px bg-navy-700 hidden sm:block"></div>
-            <div className="hidden sm:block">
-              <h1 className="flex items-center gap-2 text-sm font-bold text-white tracking-wide">
-                STAFF COMMAND CENTER
-                <span className="rounded-md border border-navy-700 bg-navy-800 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wider text-teal-400">
-                  Example data
-                </span>
-              </h1>
-            </div>
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const { data, error, loading, refresh } = useLiveQuery(`${category}:${status}`, signal => getIssues(category, status, signal));
+  const selected = data?.items.some(i => i.id === selectedId) ? selectedId : null;
+  return <div className="min-h-screen bg-navy-950 text-slate-100 selection:bg-teal-500 selection:text-white">
+    <header className="glass-nav sticky top-0 z-20 px-4 py-4"><div className="mx-auto flex max-w-6xl items-center justify-between gap-3">
+      <div className="flex items-center gap-3"><Link to="/" className="icon-btn text-slate-400" aria-label="Back to home"><Home size={20} /></Link><BrandLogo variant="dark" className="scale-75 origin-left" /><span className="hidden sm:block text-sm font-bold tracking-wide">STAFF COMMAND CENTER</span></div>
+      <p className="text-sm font-semibold text-teal-400">Reported issues</p>
+    </div></header>
+    <main className="mx-auto max-w-6xl px-4 py-6">
+      <div className="mb-4 flex flex-wrap justify-between items-center gap-3"><h1 className="text-xl font-bold">Reported issues</h1><button onClick={refresh} disabled={loading} className="rounded-full border border-navy-700 px-4 py-2 text-sm text-teal-400 disabled:opacity-50">Refresh issues</button></div>
+      <div role="status" aria-live="polite" className="mb-4 text-sm text-slate-400">
+        {error ? <p className="rounded-xl border border-amber-500/30 p-4 text-amber-300">{data ? "Connection interrupted. Showing the last saved view; these results may be out of date." : "Unable to load reported issues. Please try refreshing."}</p> : loading && !data ? <p><Loader2 size={16} className="inline animate-spin mr-2" />Loading reported issues…</p> : data ? `Updated ${new Date(data.calculatedAt).toLocaleTimeString()}` : null}
+      </div>
+      {data && <SummaryCards summary={data.summary} />}
+      {data?.truncated && <p className="mt-4 text-sm text-amber-300">Showing {data.items.length} of {data.totalCount} issues. The map shows these {data.items.length}; summary cards cover all filtered active issues.</p>}
+      <div className="mt-6 flex flex-col gap-6 lg:flex-row">
+        <section className="flex-1 min-w-0 lg:max-w-md" aria-label="Issue queue">
+          <FilterBar selectedCategory={category} selectedStatus={status} onCategoryChange={setCategory} onStatusChange={setStatus} />
+          <div className="mt-4 flex flex-col gap-3">
+            {data?.items.length === 0 && <div className="glass-panel-dark p-8 rounded-xl text-center"><h2 className="font-bold">No issues found</h2><p className="mt-2 text-sm text-slate-400">{category !== "all" || status !== "all" ? "Try another category or status." : "Saved reports appear here after analysis completes."}</p>{(category !== "all" || status !== "all") && <button className="mt-4 text-teal-400 underline" onClick={() => { setCategory("all"); setStatus("all"); }}>Clear filters</button>}</div>}
+            {data?.items.map(issue => <IssueRow key={issue.id} issue={issue} selected={selected === issue.id} onSelect={() => setSelectedId(issue.id)} />)}
           </div>
-          <div className="text-right">
-            <p className="flex items-center justify-end gap-1.5 text-xs font-medium text-slate-400 uppercase tracking-widest">
-              <span className="h-1.5 w-1.5 rounded-full bg-teal-500 motion-safe:animate-pulse" aria-hidden="true" />
-              Active Region
-            </p>
-            <p className="text-sm font-bold text-teal-400">Ward 7, Rivermill</p>
-          </div>
-        </div>
-      </header>
-
-      <main className="mx-auto max-w-6xl px-4 py-6">
-        <div className="animate-fade-up">
-          <SummaryCards issues={SAMPLE_ISSUES} />
-        </div>
-
-        <div className="mt-6 flex flex-col gap-6 lg:flex-row">
-          <section className="flex-1 lg:max-w-md">
-            <div className="mb-4 animate-fade-up" style={{ animationDelay: "80ms" }}>
-              <FilterBar
-                selectedCategory={category}
-                selectedStatus={status}
-                onCategoryChange={setCategory}
-                onStatusChange={setStatus}
-              />
-            </div>
-            <div className="flex flex-col gap-3 animate-fade-up" style={{ animationDelay: "140ms" }}>
-              {filteredIssues.length === 0 ? (
-                <div className="flex flex-col items-center gap-3 rounded-xl border border-navy-800 bg-navy-900 p-8 text-center shadow-sm">
-                  <span className="flex h-12 w-12 items-center justify-center rounded-full bg-navy-800 text-slate-500">
-                    <FilterX size={22} aria-hidden="true" />
-                  </span>
-                  <div>
-                    <p className="text-sm font-bold text-slate-300">No signals match the current filters</p>
-                    <p className="mt-1 text-xs font-medium text-slate-500">Try widening your category or status selection.</p>
-                  </div>
-                  {hasActiveFilters && (
-                    <button
-                      type="button"
-                      onClick={clearFilters}
-                      className="mt-1 rounded-full border border-navy-700 bg-navy-800 px-4 py-2 text-xs font-bold text-teal-400 transition-all duration-200 hover:border-teal-500/40 hover:bg-navy-700 active:scale-95"
-                    >
-                      Clear filters
-                    </button>
-                  )}
-                </div>
-              ) : (
-                filteredIssues.map((issue, i) => (
-                  <div key={issue.id} className="animate-fade-up" style={{ animationDelay: `${Math.min(i, 8) * 45}ms` }}>
-                    <IssueRow issue={issue} />
-                  </div>
-                ))
-              )}
-            </div>
-          </section>
-
-          <section className="flex-1 animate-fade-up lg:sticky lg:top-24 lg:h-[calc(100vh-8rem)]" style={{ animationDelay: "100ms" }}>
-            <IssueMap issues={filteredIssues} />
-          </section>
-        </div>
-      </main>
-    </div>
-  );
+        </section>
+        <section className="flex-1 min-w-0 h-[420px] lg:sticky lg:top-24 lg:h-[calc(100vh-8rem)]" aria-label="Issue map"><IssueMap issues={data?.items ?? []} selectedId={selected} onSelect={setSelectedId} /></section>
+      </div>
+    </main>
+  </div>;
 }

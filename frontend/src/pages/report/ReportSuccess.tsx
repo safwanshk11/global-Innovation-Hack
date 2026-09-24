@@ -1,166 +1,61 @@
-import { useEffect, useRef, useState } from "react";
-import { Link, useParams } from "react-router-dom";
-import { CheckCircle2, AlertTriangle, Loader2, Home, Mic, FileText, Check } from "lucide-react";
-import { getReport, ApiError, type ReportReceipt } from "../../lib/api";
+import { useState } from "react";
+import { Link, useLocation, useParams } from "react-router-dom";
+import { CheckCircle2, Loader2 } from "lucide-react";
+import { getReport, type ReportReceipt } from "../../lib/api";
+import { useLiveQuery } from "../../hooks/useLiveQuery";
 import { BrandLogo } from "../../components/BrandLogo";
 
-type FetchState = "loading" | "found" | "not-found" | "error";
-
+const messages: Record<ReportReceipt["processing_status"], [string, string]> = {
+  pending: ["Waiting for analysis", "Your report is saved and waiting to be processed."],
+  transcribing: ["Listening to your report", "Your saved voice note is being transcribed."],
+  extracting: ["Understanding the issue", "The reported details are being checked."],
+  matching: ["Checking related issues", "Your report is being compared with nearby issues."],
+  retry_wait: ["Processing will retry", "A temporary interruption occurred. Your report remains saved."],
+  complete: ["Analysis complete", "Your report has been linked to the issue below. This does not mean the issue has been resolved."],
+  needs_review: ["Review needed", "Your report is saved, but needs review before automatic processing can finish. You don't need to upload again."],
+  failed: ["Analysis couldn't finish", "Your report and uploads are saved. An operator can retry processing; you don't need to upload again."],
+  not_queued: ["Report saved", "This earlier report is not queued for automatic analysis."],
+};
+const reasons: Record<string, string> = {
+  approximate_location: "The location is approximate.", unclear_speech: "The voice note wasn't clear enough.",
+  insufficient_detail: "More detail needs review.", multiple_issues: "More than one issue was described.",
+  uncertain_category: "The issue category needs review.", invalid_extraction: "The extracted details could not be validated.",
+};
+const terminal = (r: ReportReceipt) => ["complete", "needs_review", "failed", "not_queued"].includes(r.processing_status);
 export function ReportSuccess() {
-  const { id } = useParams<{ id: string }>();
-  const [state, setState] = useState<FetchState>("loading");
-  const [receipt, setReceipt] = useState<ReportReceipt | null>(null);
-  const [retryKey, setRetryKey] = useState(0);
-  const [copied, setCopied] = useState(false);
-  const copyTimeoutRef = useRef<number | null>(null);
-
-  useEffect(() => {
-    if (!id) return;
-    let cancelled = false;
-    setState("loading");
-
-    getReport(id)
-      .then((result) => {
-        if (cancelled) return;
-        setReceipt(result);
-        setState("found");
-      })
-      .catch((err) => {
-        if (cancelled) return;
-        setState(err instanceof ApiError && err.status === 404 ? "not-found" : "error");
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [id, retryKey]);
-
-  useEffect(() => {
-    return () => {
-      if (copyTimeoutRef.current) window.clearTimeout(copyTimeoutRef.current);
-    };
-  }, []);
-
-  function handleCopy() {
-    if (!receipt?.report_id) return;
-    navigator.clipboard
-      .writeText(receipt.report_id)
-      .then(() => {
-        setCopied(true);
-        if (copyTimeoutRef.current) window.clearTimeout(copyTimeoutRef.current);
-        copyTimeoutRef.current = window.setTimeout(() => setCopied(false), 1800);
-      })
-      .catch(() => {});
+  const { id = "" } = useParams();
+  const location = useLocation();
+  const { data: receipt, error, loading, paused, refresh } = useLiveQuery(id, signal => getReport(id, signal), { interval: 2000, maxWait: 90000, terminal });
+  const [copyMessage, setCopyMessage] = useState("");
+  const saved = Boolean(receipt || location.state?.saved);
+  const message = receipt ? messages[receipt.processing_status] : null;
+  async function copy() {
+    try { await navigator.clipboard.writeText(id); setCopyMessage("Receipt ID copied."); }
+    catch { setCopyMessage("Copy unavailable. Select and copy the ID below."); }
   }
-
-  return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-offwhite px-4 py-12 text-center selection:bg-teal-500 selection:text-white">
-
-      <div className="absolute top-8 w-full flex justify-center">
-        <BrandLogo variant="light" className="scale-90 origin-left" />
+  return <div className="min-h-screen bg-offwhite px-4 py-10 flex flex-col items-center justify-center gap-8 text-center">
+    <BrandLogo variant="light" />
+    <main className="glass-panel-light w-full max-w-lg rounded-2xl p-6 sm:p-10 space-y-6">
+      <CheckCircle2 className="mx-auto text-teal-600" size={44} />
+      <h1 className="text-3xl font-bold text-navy-950">{saved ? "Report received" : error?.status === 404 ? "Report not found" : "Your report receipt"}</h1>
+      <p className="text-slate-600">{saved ? "Your upload is saved. Keep this receipt ID to check its status later." : "Keep this ID while we check the saved report."}</p>
+      <div className="rounded-xl border border-slate-200 bg-white p-4 space-y-3">
+        <p className="text-xs uppercase font-bold text-slate-500">Receipt ID</p>
+        <code className="block break-all select-all text-sm text-navy-950">{id}</code>
+        <button onClick={copy} className="rounded-lg bg-slate-100 px-4 py-2 text-sm font-bold text-navy-950">Copy ID</button>
+        <p role="status" className="text-sm text-teal-600">{copyMessage}</p>
       </div>
-
-      <div className="w-full max-w-md flex flex-col items-center gap-8">
-
-        {state === "loading" && (
-          <div className="animate-scale-in flex flex-col items-center gap-6 bg-white p-10 rounded-2xl shadow-sm border border-slate-200 w-full">
-            <Loader2 className="animate-spin text-teal-500" size={48} aria-hidden="true" />
-            <p className="text-lg font-medium text-navy-950">Retrieving digital receipt…</p>
-          </div>
-        )}
-
-        {state === "found" && receipt && (
-          <div className="animate-scale-in flex flex-col items-center gap-6 bg-white p-8 md:p-10 rounded-2xl shadow-md border border-slate-200 w-full relative overflow-hidden">
-            {/* Receipt top pattern */}
-            <div className="absolute top-0 inset-x-0 h-2 bg-gradient-to-r from-teal-400 via-teal-500 to-teal-400"></div>
-
-            <div
-              className="animate-scale-in flex h-20 w-20 items-center justify-center rounded-full bg-teal-50 border border-teal-100 text-teal-600 shadow-sm mt-2"
-              style={{ animationDelay: "150ms" }}
-            >
-              <CheckCircle2 size={40} aria-hidden="true" />
-            </div>
-
-            <div>
-              <h1 className="text-3xl font-extrabold text-navy-950 tracking-tight">Report Received</h1>
-              <p className="mt-3 text-base text-slate-600 leading-relaxed">
-                Your civic issue has been officially logged. Save this receipt ID to check on it later.
-              </p>
-            </div>
-
-            <div className="w-full rounded-xl bg-slate-50 p-4 border border-slate-200">
-              <div className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2 flex items-center justify-center gap-1.5">
-                <FileText size={14} /> Receipt ID
-              </div>
-              <div className="flex items-center justify-between gap-3 bg-white p-2 rounded-lg border border-slate-200 shadow-sm">
-                <code className="pl-3 text-lg font-mono font-bold text-navy-950 tracking-tight truncate">{receipt.report_id}</code>
-                <button
-                  onClick={handleCopy}
-                  className={`shrink-0 flex items-center gap-1.5 rounded-md px-4 py-2 text-sm font-bold transition-all duration-200 active:scale-95 ${
-                    copied ? "bg-teal-500 text-white" : "bg-slate-100 text-slate-700 hover:bg-slate-200"
-                  }`}
-                >
-                  {copied ? (
-                    <>
-                      <Check size={14} className="animate-scale-in" aria-hidden="true" />
-                      Copied!
-                    </>
-                  ) : (
-                    "Copy"
-                  )}
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {state === "not-found" && (
-          <div className="animate-scale-in flex flex-col items-center gap-6 bg-white p-10 rounded-2xl shadow-sm border border-slate-200 w-full">
-            <div className="flex h-20 w-20 items-center justify-center rounded-full bg-amber-50 border border-amber-100 text-amber-600">
-              <AlertTriangle size={40} aria-hidden="true" />
-            </div>
-            <h1 className="text-2xl font-bold text-navy-950">Report not found</h1>
-            <p className="text-slate-600">We couldn't locate a report with that ID.</p>
-          </div>
-        )}
-
-        {state === "error" && (
-          <div className="animate-scale-in flex flex-col items-center gap-6 bg-white p-10 rounded-2xl shadow-sm border border-slate-200 w-full">
-            <div className="flex h-20 w-20 items-center justify-center rounded-full bg-red-50 border border-red-100 text-red-600">
-              <AlertTriangle size={40} aria-hidden="true" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold text-navy-950 mb-2">Connection Error</h1>
-              <p className="text-slate-600">Couldn't reach the server to fetch your receipt.</p>
-            </div>
-            <button
-              type="button"
-              onClick={() => setRetryKey((k) => k + 1)}
-              className="btn-primary rounded-full px-8 py-3.5 text-base"
-            >
-              Retry
-            </button>
-          </div>
-        )}
-
-        <div className="flex w-full flex-col gap-3 sm:flex-row">
-          <Link
-            to="/report"
-            className="btn-primary group flex flex-1 items-center justify-center gap-2 rounded-full px-6 py-4 text-base focus-visible:-translate-y-0.5"
-          >
-            <Mic size={18} aria-hidden="true" className="text-teal-400 group-hover:scale-110 transition-transform" />
-            File another
-          </Link>
-          <Link
-            to="/"
-            className="btn-outline group flex flex-1 items-center justify-center gap-2 rounded-full px-6 py-4 text-base focus-visible:-translate-y-0.5"
-          >
-            <Home size={18} aria-hidden="true" className="group-hover:scale-110 transition-transform" />
-            Home
-          </Link>
-        </div>
-
-      </div>
-    </div>
-  );
+      <section aria-live="polite" className="space-y-3 text-slate-600">
+        {loading && !receipt && <p><Loader2 className="inline animate-spin mr-2" size={18} />Checking saved report status…</p>}
+        {message && <><h2 className="text-xl font-bold text-navy-950">{message[0]}</h2><p>{message[1]}</p></>}
+        {receipt?.review_reasons.map(reason => <p key={reason} className="text-sm">{reasons[reason] ?? "An operator needs to review this report."}</p>)}
+        {receipt?.issue_id && <Link className="btn-primary inline-flex rounded-full px-6 py-3" to={`/dashboard/issues/${receipt.issue_id}`}>View linked issue</Link>}
+        {error && <p role="alert" className="text-amber-700">{error.status === 404 ? "No report was found for this ID. Check the receipt link." : "Connection interrupted. The latest status is unavailable; keep your receipt ID."}</p>}
+        {paused && <p>Automatic checking has paused. Your report remains saved; processing may continue in the background.</p>}
+        {receipt && <p className="text-xs">Status updated {new Date(receipt.processing_updated_at).toLocaleString()}</p>}
+      </section>
+      <button onClick={refresh} disabled={loading} className="btn-outline rounded-full px-5 py-3 disabled:opacity-50">Check saved report status</button>
+    </main>
+    <nav className="flex flex-wrap justify-center gap-5 text-sm text-navy-950"><Link to="/report" className="underline">File another report</Link><Link to="/" className="underline">Home</Link></nav>
+  </div>;
 }
