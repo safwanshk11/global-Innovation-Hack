@@ -13,8 +13,8 @@ def _runtime():
         from faster_whisper.audio import decode_audio
         model_name = os.getenv('STT_MODEL', 'small')
         model = WhisperModel(model_name, device=os.getenv('STT_DEVICE', 'cpu'),
-                             compute_type=os.getenv('STT_COMPUTE_TYPE', 'int8'))
-        return model, decode_audio, model_name
+                             compute_type=os.getenv('STT_COMPUTE_TYPE', 'int8'), revision=os.getenv('STT_REVISION') or None)
+        return model, decode_audio, model_name + ('@' + os.environ['STT_REVISION'] if os.getenv('STT_REVISION') else '')
     except Exception:
         raise UnderstandingError('speech_runtime_unavailable') from None
 
