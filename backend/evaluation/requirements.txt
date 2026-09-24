@@ -1,0 +1,8 @@
+# Tested isolated Member 2 evaluation environment: Python 3.13.7 on macOS arm64.
+# Member 3 should incorporate compatible inference pins into requirements-worker.txt.
+pydantic==2.13.5
+pytest==9.1.1
+psycopg[binary]==3.3.6
+sentence-transformers==6.1.0
+transformers==5.17.0
+torch==2.14.0

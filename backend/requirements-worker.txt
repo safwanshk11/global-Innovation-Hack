@@ -1,0 +1,11 @@
+-r requirements.txt
+# Tested on Python 3.13.7, macOS arm64, CPU/int8 speech.
+faster-whisper==1.2.1
+ctranslate2==4.8.2
+av==18.1.0
+onnxruntime==1.30.0
+sentence-transformers==6.1.0
+transformers==5.17.0
+torch==2.14.0
+huggingface-hub==1.32.0
+numpy==2.5.3

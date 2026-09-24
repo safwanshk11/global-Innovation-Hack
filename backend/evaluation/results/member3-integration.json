@@ -1,0 +1,62 @@
+{
+  "timestamp": "2026-09-24T08:03:48.760901+00:00",
+  "branch": "feature/phase-2-pipeline",
+  "base_commit": "1d2380f2c1f6258e787e54df4eca993a41186238",
+  "working_tree_changes": true,
+  "automated_tests": {
+    "passed": 104,
+    "skipped": 0,
+    "warning": "Upstream Starlette/AnyIO deprecation warning"
+  },
+  "live_test": {
+    "report_id": "88ca72b1-8273-4cad-b8bc-8ef31652249a",
+    "issue_id": "57fa88c1-6bc1-475e-ba23-07562f921961",
+    "processing_status": "complete",
+    "match_outcome": "created",
+    "category": "pothole",
+    "severity": "low",
+    "priority_score": 11,
+    "linked_reports_before_retry": 1,
+    "linked_reports_after_retry": 1,
+    "duplicate_upload_same_receipt": true,
+    "receipt_survives_independent_get": true,
+    "real_issue_list_contains_linked_issue": true,
+    "upload_seconds": 18.333,
+    "audio_source": "macOS generated English speech; actual Whisper/LLM/embedding pipeline, not a human accuracy benchmark",
+    "worker_stage_seconds": {
+      "transcribing": 10.661,
+      "extracting": 8.382,
+      "matching": 1.267
+    }
+  },
+  "models": {
+    "speech": "Systran/faster-whisper-small",
+    "speech_revision": "536b0662742c02347bc0e980a01041f333bce120",
+    "speech_compute": "cpu/int8",
+    "extraction": "Ollama qwen2.5:7b",
+    "extraction_digest": "845dbda0ea48ed749caafd9e6037047aa19acfcfd82e704d7ca97d631a0b697e",
+    "embedding": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+    "embedding_revision": "e8f8c211226b894fcb81acc59f3b34ba3efd5f42"
+  },
+  "packages": {
+    "fastapi": "0.115.6",
+    "pydantic": "2.13.5",
+    "supabase": "2.31.0",
+    "faster-whisper": "1.2.1",
+    "ctranslate2": "4.8.2",
+    "sentence-transformers": "6.1.0",
+    "torch": "2.14.0"
+  },
+  "hardware": "macOS-26.6.2-arm64-arm-64bit-Mach-O arm64",
+  "python": "3.13.7",
+  "source_hashes": {
+    "backend/worker.py": "080a6f177e5fb34cc1b26ecd1b17baaee5c25459b1b35307e23917952e8e4c13",
+    "backend/main.py": "ec420231717fd29da110cb087d4a5a3d2e87d238d955e9e67702df69a2e4bcad",
+    "backend/services/priority.py": "cc96762af8cd8e2554677d23e34807cf8536d699278860b42e89f25e8351047a"
+  },
+  "limitations": [
+    "Generated English audio only; 12 consented human English/Tamil/Hindi recordings still required.",
+    "Frontend remains Member 4 work. Existing dashboard still uses sample data.",
+    "Live Supabase smoke test complements SQL-backed isolated integration tests; it is not a load test."
+  ]
+}

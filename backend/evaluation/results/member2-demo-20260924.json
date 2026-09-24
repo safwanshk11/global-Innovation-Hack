@@ -1,0 +1,94 @@
+{
+  "timestamp": "2026-09-24T01:07:21.191000+00:00",
+  "model": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+  "revision": "e8f8c211226b894fcb81acc59f3b34ba3efd5f42",
+  "method": "Actual pinned embeddings and PostgreSQL finalization. Controlled synthetic analysis bypasses speech/extraction.",
+  "reports": [
+    {
+      "outcome": "created",
+      "issue_id": "37aded16-877f-40f1-929d-8bc922751858",
+      "linked_at": "2026-09-24T06:37:21.124197+05:30",
+      "report_id": "30e60ad2-6aeb-4aaf-a4f5-6eb9e5183f41",
+      "combined_score": null,
+      "policy_version": "phase2-v1",
+      "distance_meters": null,
+      "semantic_similarity": null,
+      "label": "First pothole"
+    },
+    {
+      "outcome": "merged",
+      "issue_id": "37aded16-877f-40f1-929d-8bc922751858",
+      "linked_at": "2026-09-24T06:37:21.138142+05:30",
+      "report_id": "339db58e-5c57-4f5d-a9fa-f47ce333bce9",
+      "combined_score": 0.9236251595998423,
+      "policy_version": "phase2-v1",
+      "distance_meters": 3.335847799407996,
+      "semantic_similarity": 0.9018733770213542,
+      "label": "Same problem, new wording"
+    },
+    {
+      "outcome": "created",
+      "issue_id": "9fea1f0a-008d-4fbe-b703-d2167c5cad72",
+      "linked_at": "2026-09-24T06:37:21.148641+05:30",
+      "report_id": "03f27619-6650-47ab-a2e4-50b73894b9fd",
+      "combined_score": null,
+      "policy_version": "phase2-v1",
+      "distance_meters": null,
+      "semantic_similarity": null,
+      "label": "Different category nearby"
+    },
+    {
+      "outcome": "created",
+      "issue_id": "4d31a39e-6adf-40c9-b7fa-3739908ecb27",
+      "linked_at": "2026-09-24T06:37:21.158466+05:30",
+      "report_id": "b74ec780-68ef-4d51-9034-8eede97a9789",
+      "combined_score": null,
+      "policy_version": "phase2-v1",
+      "distance_meters": null,
+      "semantic_similarity": null,
+      "label": "Different physical asset"
+    },
+    {
+      "outcome": "created",
+      "issue_id": "7fc960cb-eee2-4096-83ab-9956a3a4eca7",
+      "linked_at": "2026-09-24T06:37:21.167002+05:30",
+      "report_id": "4cdca740-9f02-4d1e-a41e-155c5691f15e",
+      "combined_score": null,
+      "policy_version": "phase2-v1",
+      "distance_meters": null,
+      "semantic_similarity": null,
+      "label": "Similar complaint far away"
+    },
+    {
+      "outcome": "needs_review",
+      "issue_id": null,
+      "semantic_similarity": null,
+      "distance_meters": null,
+      "combined_score": null,
+      "label": "Approximate coordinates",
+      "report_id": "201ed2e9-387a-4498-ab83-04456b2f7d17"
+    }
+  ],
+  "issues": [
+    {
+      "id": "37aded16-877f-40f1-929d-8bc922751858",
+      "title": "Deep pothole at gate 10",
+      "linked_reports": 2
+    },
+    {
+      "id": "9fea1f0a-008d-4fbe-b703-d2167c5cad72",
+      "title": "Rubbish at gate 10",
+      "linked_reports": 1
+    },
+    {
+      "id": "4d31a39e-6adf-40c9-b7fa-3739908ecb27",
+      "title": "Pothole at gate 11",
+      "linked_reports": 1
+    },
+    {
+      "id": "7fc960cb-eee2-4096-83ab-9956a3a4eca7",
+      "title": "Deep pothole at gate 10",
+      "linked_reports": 1
+    }
+  ]
+}

@@ -1,14 +1,17 @@
 import os
 import uuid
 
-from dotenv import load_dotenv
+from settings import load_environment
 
-load_dotenv()  # must run before any os.getenv() calls below, including in other modules
+load_environment()  # API loads no worker/model dependencies.
 
-from fastapi import FastAPI, File, Form, HTTPException, UploadFile  # noqa: E402
+from fastapi import FastAPI, File, Form, HTTPException, UploadFile, Query  # noqa: E402
 from fastapi.middleware.cors import CORSMiddleware  # noqa: E402
 
-from fixtures import SAMPLE_ISSUES, get_issue_by_id  # noqa: E402
+from datetime import datetime, timezone
+from contracts import Category, IssueStatus, ReportReceipt, IssueListResponse, IssueDetail
+from repositories.reports import ReportsRepository
+from repositories.issues import IssuesRepository
 from supabase_client import SupabaseNotConfigured, get_supabase_client  # noqa: E402
 
 FRONTEND_ORIGIN = os.getenv("FRONTEND_ORIGIN", "http://localhost:5173")
@@ -37,7 +40,7 @@ def health() -> dict[str, str]:
 
 
 @app.post("/api/reports")
-async def create_report(
+def create_report(
     audio: UploadFile = File(...),
     photo: UploadFile = File(...),
     latitude: float = Form(...),
@@ -80,20 +83,20 @@ async def create_report(
                     "Supabase SQL editor."
                 ),
             ) from exc
-        raise
+        raise HTTPException(status_code=503, detail="Report storage is temporarily unavailable.") from None
     if existing.data:
         row = existing.data[0]
         return {"report_id": row["id"], "status": row["status"]}
 
     if photo.content_type not in ACCEPTED_PHOTO_TYPES:
         raise HTTPException(status_code=400, detail="Photo must be JPEG, PNG, or WebP.")
-    photo_bytes = await photo.read()
+    photo_bytes = photo.file.read(MAX_PHOTO_BYTES + 1)
     if len(photo_bytes) > MAX_PHOTO_BYTES:
         raise HTTPException(status_code=400, detail="Photo must be 5 MB or smaller.")
 
     if not (audio.content_type or "").startswith("audio/"):
         raise HTTPException(status_code=400, detail="Audio file must be an audio type.")
-    audio_bytes = await audio.read()
+    audio_bytes = audio.file.read(MAX_AUDIO_BYTES + 1)
     if len(audio_bytes) > MAX_AUDIO_BYTES:
         raise HTTPException(status_code=400, detail="Audio must be 10 MB or smaller.")
 
@@ -140,12 +143,15 @@ async def create_report(
                     supabase.storage.from_(bucket).remove([path])
                 except Exception:
                     pass
-            winner = (
-                supabase.table("reports")
-                .select("id, status")
-                .eq("submission_id", submission_id)
-                .execute()
-            )
+            try:
+                winner = (
+                    supabase.table("reports")
+                    .select("id, status")
+                    .eq("submission_id", submission_id)
+                    .execute()
+                )
+            except Exception:
+                raise HTTPException(status_code=503, detail="Report status is temporarily unavailable. Retry this submission.") from None
             if winner.data:
                 row = winner.data[0]
                 return {"report_id": row["id"], "status": row["status"]}
@@ -164,39 +170,42 @@ def _is_unique_violation(exc: Exception) -> bool:
     return getattr(exc, "code", None) == "23505" or "duplicate key value" in str(exc)
 
 
-@app.get("/api/reports/{report_id}")
+def _parse_id(value: str):
+    try:
+        return uuid.UUID(value)
+    except ValueError:
+        raise HTTPException(status_code=404, detail="Not found.") from None
+
+
+@app.get("/api/reports/{report_id}", response_model=ReportReceipt)
 def get_report(report_id: str):
+    parsed = _parse_id(report_id)
     try:
-        supabase = get_supabase_client()
-    except SupabaseNotConfigured as exc:
-        raise HTTPException(status_code=503, detail=str(exc)) from exc
-
-    try:
-        result = (
-            supabase.table("reports")
-            .select("id, status, created_at")
-            .eq("id", report_id)
-            .execute()
-        )
-    except Exception as exc:
-        raise HTTPException(status_code=404, detail="Report not found.") from exc
-
-    rows = result.data or []
-    if not rows:
+        receipt = ReportsRepository(get_supabase_client()).receipt(parsed)
+    except Exception:
+        raise HTTPException(status_code=503, detail="Report status is temporarily unavailable.") from None
+    if receipt is None:
         raise HTTPException(status_code=404, detail="Report not found.")
-
-    row = rows[0]
-    return {"report_id": row["id"], "status": row["status"], "created_at": row["created_at"]}
+    return receipt.model_dump(mode="json")
 
 
-@app.get("/api/issues")
-def list_issues():
-    return SAMPLE_ISSUES
+@app.get("/api/issues", response_model=IssueListResponse)
+def list_issues(category: Category | None = None, status: IssueStatus | None = None,
+                limit: int = Query(default=500, ge=1, le=500)):
+    try:
+        return IssuesRepository(get_supabase_client()).list(now=datetime.now(timezone.utc),
+            category=category,status=status.value if status else None,limit=limit)
+    except Exception:
+        raise HTTPException(status_code=503, detail="Issues are temporarily unavailable.") from None
 
 
-@app.get("/api/issues/{issue_id}")
+@app.get("/api/issues/{issue_id}", response_model=IssueDetail)
 def get_issue(issue_id: str):
-    issue = get_issue_by_id(issue_id)
-    if not issue:
+    parsed = _parse_id(issue_id)
+    try:
+        issue = IssuesRepository(get_supabase_client()).detail(parsed,now=datetime.now(timezone.utc))
+    except Exception:
+        raise HTTPException(status_code=503, detail="Issue details are temporarily unavailable.") from None
+    if issue is None:
         raise HTTPException(status_code=404, detail="Issue not found.")
     return issue

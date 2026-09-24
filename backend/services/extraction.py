@@ -19,7 +19,12 @@ garbage, streetlight; other only for understandable out-of-taxonomy civic proble
 Severity: low = minor inconvenience; medium = meaningful localized disruption;
 high = reported health/access risk or substantial service disruption;
 critical = explicit immediate serious danger. The word urgent alone is insufficient.
-Every severity signal needs an exact supporting quote from transcript_en.
+Every severity signal needs an exact supporting quote from transcript_en, never a paraphrase.
+Only include facts explicitly present. Do not add assumed affected people or hypothetical hazards.
+Always return review_reasons as a JSON array (use [] when no review is needed, NEVER null).
+A simple pothole report without danger evidence is low severity with severity_signals=[].
+Example input: {"transcript_en":"There is a small pothole by gate 10."}
+Example output: {"category":"pothole","severity":"low","title":"Small pothole by gate 10","summary_en":"A small pothole is reported by gate 10.","location_mention":"by gate 10","duration_days_claimed":null,"severity_signals":[],"review_reasons":[]}
 Use review_reasons for unclear, insufficient, uncertain or multiple distinct complaints.
 Do not silently discard one complaint from a multi-issue recording.
 Never invent injuries, coordinates, population, identities, repair status or geographic facts.
@@ -40,7 +45,7 @@ class JsonEndpoint:
 
     def complete(self, messages):
         payload = {'model': self.model, 'messages': messages,
-                   'response_format': {'type': 'json_object'}}
+                   'response_format': {'type': 'json_object'}, 'temperature': 0}
         headers = {'Content-Type': 'application/json'}
         if self.key:
             headers['Authorization'] = f'Bearer {self.key}'
@@ -89,5 +94,5 @@ def extract_complaint(speech: SpeechResult, *, endpoint=None) -> AnalysisResult:
             pass
         if attempt == 0:
             # No invalid model text or provider details are echoed into the prompt/logs.
-            messages.append({'role': 'user', 'content': 'Your response failed validation. Return schema-valid JSON; all evidence/location quotes must occur in transcript_en. Do not invent facts.'})
+            messages.append({'role': 'user', 'content': 'Your response failed validation. Return the complaint object, not the schema. review_reasons and severity_signals must be arrays (use [] if none). All evidence and location quotes must occur literally in transcript_en. Do not invent or paraphrase evidence.'})
     raise UnderstandingError('invalid_extraction', review=True)
