@@ -1,0 +1,292 @@
+[
+  {
+    "case_id": "ind-00",
+    "text_original": "A deep pothole beside gate 731 makes the road uneven.",
+    "text_en_reference": "A deep pothole beside gate 731 makes the road uneven.",
+    "language": "en",
+    "latitude": 13.018,
+    "longitude": 80.218,
+    "location_source": "browser",
+    "expected_category": "pothole",
+    "expected_severity": "low",
+    "ground_truth_issue_id": "ind-a",
+    "split": "development",
+    "scenario_tags": [
+      "independently_authored",
+      "same_asset_pair"
+    ],
+    "analysis_input": {
+      "category": "pothole",
+      "severity": "low",
+      "title": "pothole near gate 731",
+      "summary_en": "A deep pothole beside gate 731 makes the road uneven.",
+      "location_mention": "gate 731",
+      "duration_days_claimed": null,
+      "severity_signals": [],
+      "review_reasons": [],
+      "extraction_model": "controlled-text-fixture",
+      "pipeline_version": "phase2-v1"
+    }
+  },
+  {
+    "case_id": "ind-01",
+    "text_original": "The road has a large hole near gate 731.",
+    "text_en_reference": "The road has a large hole near gate 731.",
+    "language": "en",
+    "latitude": 13.01801,
+    "longitude": 80.21801,
+    "location_source": "browser",
+    "expected_category": "pothole",
+    "expected_severity": "low",
+    "ground_truth_issue_id": "ind-a",
+    "split": "development",
+    "scenario_tags": [
+      "independently_authored",
+      "same_asset_pair"
+    ],
+    "analysis_input": {
+      "category": "pothole",
+      "severity": "low",
+      "title": "pothole near gate 731",
+      "summary_en": "The road has a large hole near gate 731.",
+      "location_mention": "gate 731",
+      "duration_days_claimed": null,
+      "severity_signals": [],
+      "review_reasons": [],
+      "extraction_model": "controlled-text-fixture",
+      "pipeline_version": "phase2-v1"
+    }
+  },
+  {
+    "case_id": "ind-02",
+    "text_original": "The streetlight at pole 844 has stopped working.",
+    "text_en_reference": "The streetlight at pole 844 has stopped working.",
+    "language": "en",
+    "latitude": 13.018,
+    "longitude": 80.218,
+    "location_source": "browser",
+    "expected_category": "streetlight",
+    "expected_severity": "low",
+    "ground_truth_issue_id": "ind-b",
+    "split": "development",
+    "scenario_tags": [
+      "independently_authored",
+      "distinct_issue"
+    ],
+    "analysis_input": {
+      "category": "streetlight",
+      "severity": "low",
+      "title": "streetlight near pole 844",
+      "summary_en": "The streetlight at pole 844 has stopped working.",
+      "location_mention": "pole 844",
+      "duration_days_claimed": null,
+      "severity_signals": [],
+      "review_reasons": [],
+      "extraction_model": "controlled-text-fixture",
+      "pipeline_version": "phase2-v1"
+    }
+  },
+  {
+    "case_id": "ind-03",
+    "text_original": "Garbage bags are accumulating outside gate 928.",
+    "text_en_reference": "Garbage bags are accumulating outside gate 928.",
+    "language": "en",
+    "latitude": 13.026,
+    "longitude": 80.226,
+    "location_source": "browser",
+    "expected_category": "garbage",
+    "expected_severity": "low",
+    "ground_truth_issue_id": "ind-c",
+    "split": "development",
+    "scenario_tags": [
+      "independently_authored",
+      "distinct_issue"
+    ],
+    "analysis_input": {
+      "category": "garbage",
+      "severity": "low",
+      "title": "garbage near gate 928",
+      "summary_en": "Garbage bags are accumulating outside gate 928.",
+      "location_mention": "gate 928",
+      "duration_days_claimed": null,
+      "severity_signals": [],
+      "review_reasons": [],
+      "extraction_model": "controlled-text-fixture",
+      "pipeline_version": "phase2-v1"
+    }
+  },
+  {
+    "case_id": "ind-04",
+    "text_original": "Water is leaking beside gate 573.",
+    "text_en_reference": "Water is leaking beside gate 573.",
+    "language": "en",
+    "latitude": 13.041,
+    "longitude": 80.241,
+    "location_source": "browser",
+    "expected_category": "water",
+    "expected_severity": "low",
+    "ground_truth_issue_id": "ind-d",
+    "split": "held_out",
+    "scenario_tags": [
+      "independently_authored",
+      "same_asset_pair"
+    ],
+    "analysis_input": {
+      "category": "water",
+      "severity": "low",
+      "title": "water near gate 573",
+      "summary_en": "Water is leaking beside gate 573.",
+      "location_mention": "gate 573",
+      "duration_days_claimed": null,
+      "severity_signals": [],
+      "review_reasons": [],
+      "extraction_model": "controlled-text-fixture",
+      "pipeline_version": "phase2-v1"
+    }
+  },
+  {
+    "case_id": "ind-05",
+    "text_original": "There is a water supply leak near gate 573.",
+    "text_en_reference": "There is a water supply leak near gate 573.",
+    "language": "en",
+    "latitude": 13.04101,
+    "longitude": 80.24101,
+    "location_source": "browser",
+    "expected_category": "water",
+    "expected_severity": "low",
+    "ground_truth_issue_id": "ind-d",
+    "split": "held_out",
+    "scenario_tags": [
+      "independently_authored",
+      "same_asset_pair"
+    ],
+    "analysis_input": {
+      "category": "water",
+      "severity": "low",
+      "title": "water near gate 573",
+      "summary_en": "There is a water supply leak near gate 573.",
+      "location_mention": "gate 573",
+      "duration_days_claimed": null,
+      "severity_signals": [],
+      "review_reasons": [],
+      "extraction_model": "controlled-text-fixture",
+      "pipeline_version": "phase2-v1"
+    }
+  },
+  {
+    "case_id": "ind-06",
+    "text_original": "Wastewater is overflowing from drain 617.",
+    "text_en_reference": "Wastewater is overflowing from drain 617.",
+    "language": "en",
+    "latitude": 13.041,
+    "longitude": 80.241,
+    "location_source": "browser",
+    "expected_category": "sewage",
+    "expected_severity": "low",
+    "ground_truth_issue_id": "ind-e",
+    "split": "held_out",
+    "scenario_tags": [
+      "independently_authored",
+      "distinct_issue"
+    ],
+    "analysis_input": {
+      "category": "sewage",
+      "severity": "low",
+      "title": "sewage near drain 617",
+      "summary_en": "Wastewater is overflowing from drain 617.",
+      "location_mention": "drain 617",
+      "duration_days_claimed": null,
+      "severity_signals": [],
+      "review_reasons": [],
+      "extraction_model": "controlled-text-fixture",
+      "pipeline_version": "phase2-v1"
+    }
+  },
+  {
+    "case_id": "ind-07",
+    "text_original": "The lamp at pole 862 is out.",
+    "text_en_reference": "The lamp at pole 862 is out.",
+    "language": "en",
+    "latitude": 13.048,
+    "longitude": 80.248,
+    "location_source": "browser",
+    "expected_category": "streetlight",
+    "expected_severity": "low",
+    "ground_truth_issue_id": "ind-f",
+    "split": "held_out",
+    "scenario_tags": [
+      "independently_authored",
+      "distinct_issue"
+    ],
+    "analysis_input": {
+      "category": "streetlight",
+      "severity": "low",
+      "title": "streetlight near pole 862",
+      "summary_en": "The lamp at pole 862 is out.",
+      "location_mention": "pole 862",
+      "duration_days_claimed": null,
+      "severity_signals": [],
+      "review_reasons": [],
+      "extraction_model": "controlled-text-fixture",
+      "pipeline_version": "phase2-v1"
+    }
+  },
+  {
+    "case_id": "ind-08",
+    "text_original": "A pothole has formed near gate 990.",
+    "text_en_reference": "A pothole has formed near gate 990.",
+    "language": "en",
+    "latitude": 13.051,
+    "longitude": 80.251,
+    "location_source": "browser",
+    "expected_category": "pothole",
+    "expected_severity": "low",
+    "ground_truth_issue_id": "ind-g",
+    "split": "held_out",
+    "scenario_tags": [
+      "independently_authored",
+      "same_asset_pair"
+    ],
+    "analysis_input": {
+      "category": "pothole",
+      "severity": "low",
+      "title": "pothole near gate 990",
+      "summary_en": "A pothole has formed near gate 990.",
+      "location_mention": "gate 990",
+      "duration_days_claimed": null,
+      "severity_signals": [],
+      "review_reasons": [],
+      "extraction_model": "controlled-text-fixture",
+      "pipeline_version": "phase2-v1"
+    }
+  },
+  {
+    "case_id": "ind-09",
+    "text_original": "A hole in the road by gate 990 needs repair.",
+    "text_en_reference": "A hole in the road by gate 990 needs repair.",
+    "language": "en",
+    "latitude": 13.05101,
+    "longitude": 80.25101,
+    "location_source": "browser",
+    "expected_category": "pothole",
+    "expected_severity": "low",
+    "ground_truth_issue_id": "ind-g",
+    "split": "held_out",
+    "scenario_tags": [
+      "independently_authored",
+      "same_asset_pair"
+    ],
+    "analysis_input": {
+      "category": "pothole",
+      "severity": "low",
+      "title": "pothole near gate 990",
+      "summary_en": "A hole in the road by gate 990 needs repair.",
+      "location_mention": "gate 990",
+      "duration_days_claimed": null,
+      "severity_signals": [],
+      "review_reasons": [],
+      "extraction_model": "controlled-text-fixture",
+      "pipeline_version": "phase2-v1"
+    }
+  }
+]

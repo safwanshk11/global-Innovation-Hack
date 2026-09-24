@@ -1,0 +1,21 @@
+{
+  "status": "awaiting_real_pairs",
+  "pairs": [],
+  "example_pair": {
+    "id": "pair-01",
+    "consent": true,
+    "first_image": {
+      "file": "images/first.jpg",
+      "sha256": "SHA256_OF_FILE"
+    },
+    "second_image": {
+      "file": "images/second.jpg",
+      "sha256": "SHA256_OF_FILE"
+    },
+    "prediction": "same_issue",
+    "ground_truth": "different_issues",
+    "outcome": "false_positive",
+    "reviewer": "REVIEWER_IDENTIFIER",
+    "rationale": "Images depict different road defects at distinct landmarks."
+  }
+}

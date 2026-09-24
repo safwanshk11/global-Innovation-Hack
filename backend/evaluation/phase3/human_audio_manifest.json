@@ -1,0 +1,14 @@
+{
+  "status": "awaiting_consented_recordings",
+  "recordings": [],
+  "example_record": {
+    "id": "en-01",
+    "language": "en",
+    "file": "audio/en-01.wav",
+    "sha256": "SHA256_OF_FILE",
+    "consent": true,
+    "speaker_reviewer": "REVIEWER_IDENTIFIER",
+    "reference_transcript": "HUMAN_TRANSCRIPTION",
+    "expected_category": "pothole"
+  }
+}
