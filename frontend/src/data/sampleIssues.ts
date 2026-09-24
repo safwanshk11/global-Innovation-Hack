@@ -17,7 +17,7 @@ const SEVERITY_WEIGHT: Record<Issue["severity"], number> = {
 export function computePriorityScore(issue: Issue): number {
   const severityPoints = SEVERITY_WEIGHT[issue.severity] * 20;
   const corroborationPoints = Math.min(issue.corroborationCount * 3, 60);
-  const populationPoints = Math.min(issue.estimatedAffectedPopulation / 20, 30);
+  const populationPoints = Math.min((issue.estimatedAffectedPopulation ?? 0) / 20, 30);
   const agePoints = Math.min(issue.daysOpen * 1.5, 20);
   const rawScore = severityPoints + corroborationPoints + populationPoints + agePoints;
   // Normalize to a 0-100 scale (max raw score is 190)

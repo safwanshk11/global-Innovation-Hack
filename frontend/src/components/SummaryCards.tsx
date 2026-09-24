@@ -1,23 +1,12 @@
 import { AlertTriangle, ListChecks, Users, Clock } from "lucide-react";
-import type { IssueWithPriority } from "../types/issue";
+import type { IssueSummary } from "../types/issue";
 
-interface SummaryCardsProps {
-  issues: IssueWithPriority[];
-}
-
-export function SummaryCards({ issues }: SummaryCardsProps) {
-  const openIssues = issues.filter((i) => i.status !== "resolved");
-  const criticalCount = openIssues.filter((i) => i.priorityScore >= 90).length;
-  const totalCorroboration = openIssues.reduce((sum, i) => sum + i.corroborationCount, 0);
-  const avgDaysOpen = openIssues.length
-    ? Math.round(openIssues.reduce((sum, i) => sum + i.daysOpen, 0) / openIssues.length)
-    : 0;
-
+export function SummaryCards({ summary }: { summary: IssueSummary }) {
   const cards = [
-    { label: "Active signals", value: openIssues.length, icon: ListChecks, classes: "text-teal-400 bg-teal-500/10 border-teal-500/20" },
-    { label: "Critical priority", value: criticalCount, icon: AlertTriangle, classes: "text-red-400 bg-red-500/10 border-red-500/20" },
-    { label: "Total corroborations", value: totalCorroboration, icon: Users, classes: "text-cyan-400 bg-cyan-500/10 border-cyan-500/20" },
-    { label: "Avg. days open", value: avgDaysOpen, icon: Clock, classes: "text-amber-400 bg-amber-500/10 border-amber-500/20" },
+    { label: "Active signals", value: summary.activeIssueCount, icon: ListChecks, classes: "text-teal-400 bg-teal-500/10 border-teal-500/20" },
+    { label: "Critical priority", value: summary.criticalPriorityCount, icon: AlertTriangle, classes: "text-red-400 bg-red-500/10 border-red-500/20" },
+    { label: "Linked reports", value: summary.linkedReportCount, icon: Users, classes: "text-cyan-400 bg-cyan-500/10 border-cyan-500/20" },
+    { label: "Avg. days open", value: summary.averageDaysOpen === null ? "—" : summary.averageDaysOpen.toFixed(1), icon: Clock, classes: "text-amber-400 bg-amber-500/10 border-amber-500/20" },
   ];
 
   return (
